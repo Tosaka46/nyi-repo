@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letter Falling Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #1f70b2, #7fb0d1);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0;
+      color: white;
+    }
+
+    nav {
+      background-color: #000000a0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    nav a {
+      color: #00f7ff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 8px 15px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background-color: #00f7ff;
+      color: #000;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #ffcc00;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .game-info {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .info-box {
+      padding: 10px;
+    }
+
+    .info-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 2px solid #ffcc00;
+    }
+
+    .letter {
+      position: absolute;
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      padding: 10px 15px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .input-area {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    #letter-input {
+      width: 100%;
+      padding: 15px;
+      font-size: 20px;
+      text-align: center;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      outline: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #feedback {
+      min-height: 60px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+
+    .correct {
+      background: rgba(0, 255, 0, 0.2) !important;
+      color: #00ff00;
+    }
+
+    .incorrect {
+      background: rgba(255, 0, 0, 0.2) !important;
+      color: #ff5555;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+
+    #start-btn {
+      background: #4CAF50;
+      color: white;
+    }
+
+    #start-btn:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+
+    #reset-btn {
+      background: #f44336;
+      color: white;
+    }
+
+    #reset-btn:hover {
+      background: #d32f2f;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+
+      #game-area {
+        height: 300px;
+      }
+
+      .game-info {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="music1.html">Music</a>
+    <a href="game.html">Game Menu</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <div class="container">
+    <h1>English Letter Falling Game</h1>
+
+    <div class="game-info">
+      <div class="info-box">
+        <div>Score</div>
+        <div id="score" class="info-value">0</div>
+      </div>
+      <div class="info-box">
+        <div>Level</div>
+        <div id="level" class="info-value">1</div>
+      </div>
+      <div class="info-box">
+        <div>Lives</div>
+        <div id="lives" class="info-value">3</div>
+      </div>
+    </div>
+
+    <div id="game-area"></div>
+
+    <div class="input-area">
+      <input type="text" id="letter-input" placeholder="Type the falling letter here" autocomplete="off" />
+    </div>
+
+    <div id="feedback">Type the falling letters before they reach the bottom!</div>
+
+    <div class="controls">
+      <button id="start-btn">Start Game</button>
+      <button id="reset-btn">Reset Game</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const gameArea = document.getElementById('game-area');
+      const letterInput = document.getElementById('letter-input');
+      const feedback = document.getElementById('feedback');
+      const scoreDisplay = document.getElementById('score');
+      const levelDisplay = document.getElementById('level');
+      const livesDisplay = document.getElementById('lives');
+      const startBtn = document.getElementById('start-btn');
+      const resetBtn = document.getElementById('reset-btn');
+
+      let score = 0;
+      let level = 1;
+      let lives = 3;
+      let gameInterval;
+      let letterInterval;
+      let gameRunning = false;
+      let currentLetters = [];
+      let fallSpeed = 2;
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+      startBtn.addEventListener('click', startGame);
+      resetBtn.addEventListener('click', resetGame);
+      letterInput.addEventListener('input', checkInput);
+
+      function startGame() {
+        if (gameRunning) return;
+
+        gameRunning = true;
+        startBtn.disabled = true;
+        letterInput.disabled = false;
+        letterInput.focus();
+        feedback.textContent = "Game started! Type the falling letters.";
+        clearGameArea();
+        letterInterval = setInterval(createLetter, 2000);
+        gameInterval = setInterval(updateGame, 50);
+      }
+
+      function resetGame() {
+        clearInterval(gameInterval);
+        clearInterval(letterInterval);
+        gameRunning = false;
+        startBtn.disabled = false;
+        letterInput.disabled = true;
+
+        score = 0;
+        level = 1;
+        lives = 3;
+        fallSpeed = 2;
+
+        scoreDisplay.textContent = score;
+        levelDisplay.textContent = level;
+        livesDisplay.textContent = lives;
+
+        clearGameArea();
+        currentLetters = [];
+
+        feedback.textContent = "Game reset. Press Start Game to play!";
+        letterInput.value = "";
+      }
+
+      function createLetter() {
+        if (!gameRunning) return;
+
+        const letter = letters[Math.floor(Math.random() * letters.length)];
+        const letterElement = document.createElement('div');
+        letterElement.className = 'letter';
+        letterElement.textContent = letter;
+
+        const maxLeft = gameArea.offsetWidth - 50;
+        const left = Math.floor(Math.random() * maxLeft);
+        letterElement.style.left = left + 'px';
+        letterElement.style.top = '0px';
+
+        const hue = Math.floor(Math.random() * 360);
+        letterElement.style.background = `linear-gradient(hsl(${hue}, 80%, 60%), hsl(${hue}, 80%, 40%))`;
+
+        gameArea.appendChild(letterElement);
+
+        currentLetters.push({ element: letterElement, letter: letter, top: 0, left: left });
+      }
+
+      function updateGame() {
+        if (!gameRunning) return;
+
+        for (let i = 0; i < currentLetters.length; i++) {
+          const letter = currentLetters[i];
+          letter.top += fallSpeed;
+          letter.element.style.top = letter.top + 'px';
+
+          if (letter.top > gameArea.offsetHeight - 40) {
+            if (gameArea.contains(letter.element)) {
+              gameArea.removeChild(letter.element);
+            }
+            currentLetters.splice(i, 1);
+            i--;
+            loseLife();
+          }
+        }
+      }
+
+      function checkInput() {
+        if (!gameRunning || currentLetters.length === 0) return;
+
+        const input = letterInput.value.toUpperCase();
+        for (let i = 0; i < currentLetters.length; i++) {
+          const letter = currentLetters[i];
+
+          if (input === letter.letter) {
+            letter.element.style.transform = 'scale(1.5)';
+            letter.element.style.opacity = '0';
+            setTimeout(() => {
+              if (gameArea.contains(letter.element)) {
+                gameArea.removeChild(letter.element);
+              }
+            }, 200);
+            currentLetters.splice(i, 1);
+            score += 10;
+            scoreDisplay.textContent = score;
+
+            if (score % 100 === 0) levelUp();
+
+            feedback.textContent = 'Correct!';
+            feedback.className = 'correct';
+            letterInput.value = '';
+            return;
+          }
+        }
+
+        feedback.textContent = 'Incorrect!';
+        feedback.className = 'incorrect';
+        setTimeout(() => {
+          letterInput.value = '';
+        }, 1000);
+      }
+
+      function levelUp() {
+        level++;
+        levelDisplay.textContent = level;
+        fallSpeed += 0.5;
+        feedback.textContent = `Level Up! Now at level ${level}.`;
+        feedback.className = 'correct';
+      }
+
+      function loseLife() {
+        lives--;
+        livesDisplay.textContent = lives;
+        feedback.textContent = `You missed a letter! Lives left: ${lives}`;
+        feedback.className = 'incorrect';
+
+        if (lives <= 0) endGame();
+      }
+
+      function endGame() {
+        clearInterval(gameInterval);
+        clearInterval(letterInterval);
+        gameRunning = false;
+        feedback.textContent = `Game Over! Final Score: ${score} | Level: ${level}`;
+        feedback.className = 'incorrect';
+        startBtn.disabled = false;
+        letterInput.disabled = true;
+      }
+
+      function clearGameArea() {
+        while (gameArea.firstChild) {
+          gameArea.removeChild(gameArea.firstChild);
+        }
+      }
+
+      resetGame();
+    });
+  </script>
+</body>
+</html>

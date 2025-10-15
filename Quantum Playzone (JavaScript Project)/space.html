@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Skirmish</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      color: white;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px 0;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 0 15px #00f0ff;
+    }
+
+    nav a {
+      color: #00f0ff;
+      text-decoration: none;
+      margin: 0 25px;
+      font-size: 18px;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+
+    nav a:hover {
+      color: white;
+      text-shadow: 0 0 10px #00f0ff, 0 0 20px #007bff;
+    }
+
+    .overlayScreen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      margin-top: 50px;
+    }
+
+    .overlayBox {
+      background: #0d1117;
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 0 25px #00f0ff, 0 0 50px #0088ff inset;
+      color: #00f0ff;
+      width: 400px;
+      animation: popIn 0.5s ease-out;
+      margin-top: 30px;
+    }
+
+    .overlayBox h1 {
+      font-size: 30px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00f0ff;
+    }
+
+    .overlayBox p {
+      font-size: 18px;
+      margin: 15px 0;
+      color: #fff;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 16px;
+      margin: 10px 0;
+      width: 80%;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      text-align: center;
+      background: #1a1f29;
+      color: #00f0ff;
+      box-shadow: 0 0 10px #00f0ff inset;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 18px;
+      margin: 10px;
+      background: linear-gradient(45deg, #00f0ff, #007bff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px #00f0ff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #00f0ff, 0 0 40px #007bff;
+    }
+
+    #gameCanvas {
+      display: none;
+      background: radial-gradient(circle at center, #001d3d, #000);
+      margin: auto;
+      display: block;
+      margin-top: 80px; 
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="music1.html">Music</a>
+    <a href="game.html">Game Menu</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <div id="welcomeScreen" class="overlayScreen">
+    <div class="overlayBox">
+      <h1>🛸WELCOME TO SPACE SKIRMISH🛸</h1>
+      <input type="text" id="playerName" placeholder="Enter your name"><br>
+      <button id="playBtn">Play</button>
+    </div>
+  </div>
+
+  <div id="gameOverScreen" class="overlayScreen" style="display:none;">
+    <div class="overlayBox">
+      <h1> GAME OVER </h1>
+      <p id="finalResult"></p>
+      <button id="restartBtn">Restart</button>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    const finalResult = document.getElementById("finalResult");
+
+    let player = { name: "", score: 0, alive: true };
+    let ship, bullets, enemies, gameLoopId, spawnIntervalId, autoFireId;
+
+    document.getElementById("playBtn").addEventListener("click", () => {
+      let name = document.getElementById("playerName").value.trim();
+      if(name === "") {
+        alert("Please enter your name!");
+        return;
+      }
+
+      player.name = name;
+      player.score = 0;
+      player.alive = true;
+
+      welcomeScreen.style.display = "none";
+      gameOverScreen.style.display = "none";
+      canvas.style.display = "block";
+
+      startGame();
+    });
+
+    function resetGame() {
+      ship = { x: canvas.width/2 - 25, y: canvas.height - 80, size: 60, speed: 20 };
+      bullets = [];
+      enemies = [];
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (!player.alive) return;
+      if (e.code === "ArrowLeft") {
+        ship.x = Math.max(0, ship.x - ship.speed);
+      }
+      if (e.code === "ArrowRight") {
+        ship.x = Math.min(canvas.width - ship.size, ship.x + ship.speed);
+      }
+    });
+
+    function spawnEnemy() {
+      let x = Math.random() * (canvas.width - 40);
+      enemies.push({ x: x, y: -30, size: 40, speed: 2 });
+    }
+
+    function drawShip() {
+      ctx.font = ship.size + "px Arial";
+      ctx.fillText("🎮", ship.x, ship.y + ship.size);
+    }
+
+    function drawBullet(b) {
+      ctx.fillStyle = "red";
+      ctx.fillRect(b.x, b.y, b.width, b.height);
+    }
+
+    function drawEnemy(en) {
+      ctx.font = en.size + "px Arial";
+      ctx.fillText("🛸", en.x, en.y + en.size);
+    }
+
+    function startGame() {
+      resetGame();
+
+      spawnIntervalId = setInterval(spawnEnemy, 1200);
+      autoFireId = setInterval(() => {
+        if (player.alive) {
+          bullets.push({ x: ship.x + ship.size/2 - 10, y: ship.y, width: 5, height: 15 });
+          bullets.push({ x: ship.x + ship.size/2 + 10, y: ship.y, width: 5, height: 15 });
+          bullets.push({ x: ship.x + ship.size/2 + 30, y: ship.y, width: 5, height: 15 });
+        }
+      }, 250);
+
+      gameLoop();
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawShip();
+
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].y -= 8;
+        drawBullet(bullets[i]);
+        if (bullets[i].y < 0) bullets.splice(i, 1);
+      }
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        let en = enemies[i];
+        en.y += en.speed;
+        drawEnemy(en);
+
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          let b = bullets[j];
+          if (b.x < en.x + en.size && b.x + b.width > en.x &&
+              b.y < en.y + en.size && b.y + b.height > en.y) {
+            enemies.splice(i, 1);
+            bullets.splice(j, 1);
+            player.score++;
+            break;
+          }
+        }
+
+        if (en.x < ship.x + ship.size && en.x + en.size > ship.x &&
+            en.y < ship.y + ship.size && en.y + en.size > ship.y) {
+          gameOver();
+          return;
+        }
+
+        if (en.y > canvas.height - 50) {
+          gameOver();
+          return;
+        }
+      }
+
+      ctx.fillStyle = "white";
+      ctx.font = "20px Orbitron";
+      ctx.textAlign = "left";
+      ctx.fillText(player.name + " | Score: " + player.score, 10, 30);
+
+      if (player.alive) {
+        gameLoopId = requestAnimationFrame(gameLoop);
+      }
+    }
+
+    function gameOver() {
+      player.alive = false;
+      clearInterval(spawnIntervalId);
+      clearInterval(autoFireId);
+      cancelAnimationFrame(gameLoopId);
+      canvas.style.display = "none";
+      gameOverScreen.style.display = "flex";
+      finalResult.innerText = player.name + " scored " + player.score + " points!";
+    }
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      welcomeScreen.style.display = "flex";
+      gameOverScreen.style.display = "none";
+    });
+  </script>
+</body>
+</html>

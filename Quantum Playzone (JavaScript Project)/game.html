@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quantum Playzone - Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+	* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+    nav {
+  background-color: #000000a0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+
+nav a {
+  color: #00f7ff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+header {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: rgba(0,0,0,0.6);
+  font-size: 2em;
+  color: #00f7ff;
+}
+
+    .game-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .game-card {
+      width: 220px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: white;
+      text-align: center;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .game-card:hover {
+      transform: scale(1.05);
+      border-color: #555;
+    }
+
+    .game-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .game-card h3 {
+      margin: 10px 0;
+      font-size: 1.1rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="music1.html">Music</a>
+    <a href="game.html">Game</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <header>
+    🕹️ Game Zone
+  </header>
+
+  <section class="game-gallery">
+    <div class="game-card">
+      <a href="flappybird.html">
+        <img src="frappybird.jpg" alt="Game 1 Cover" />
+        <h3>Flappy Bird</h3>
+      </a>
+    </div>
+
+    <div class="game-card">
+      <a href="space.html">
+        <img src="spacegame.jpg" alt="Game 2 Cover" />
+        <h3>Space Skirmish</h3>
+      </a>
+    </div>
+
+    <div class="game-card">
+      <a href="SnakeGame.html">
+        <img src="snakegame.jpg" alt="Game 3 Cover" />
+        <h3>Snake Game</h3>
+      </a>
+    </div>
+
+    <div class="game-card">
+      <a href="gameError.html">
+        <img src="gameerror.jpg" alt="Game 4 Cover" />
+        <h3>Falling Letters</h3>
+      </a>
+    </div>
+	
+	   <div class="game-card">
+      <a href="numberguessing.html">
+        <img src="guess.jpg" alt="Game 5 Cover" />
+        <h3>Number Guessing</h3>
+      </a>
+    </div>
+  </section>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quantum Playzone</title>
+  <style>
+    * {
+      scroll-behavior: smooth;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+    }
+
+    nav {
+      background-color: #000000a0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: #00f7ff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 8px 15px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background-color: #00f7ff;
+      color: #000;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px;
+      background-color: rgba(0,0,0,0.6);
+      font-size: 2.5em;
+      color: #00f7ff;
+    }
+
+    section {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    button, .link-btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #00f7ff;
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover, .link-btn:hover {
+      background-color: #00c1cc;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .counter-display {
+      font-size: 2rem;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#music">Music</a>
+    <a href="#game">Game</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <header id="home">
+    🎮 Welcome to Quantum Playzone 🎵
+  </header>
+
+  <section>
+    <h2>Explore the Fun</h2>
+    <p>Start your adventure by choosing what you want to do:</p>
+    <a href="#music" class="link-btn">🎵 Go to Music Zone</a>
+    <a href="#game" class="link-btn">🕹️ Play a Game</a>
+  </section>
+
+  <section id="music" class="card">
+    <h2>🎵 Music Zone</h2>
+    <p>Relax with some cool background music while you play!</p>
+    <audio id="bg-music" controls loop>
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </section>
+
+  <section id="game" class="card">
+    <h2>🕹️ Click Game</h2>
+    <p>Click the button as many times as you can!</p>
+    <div class="counter-display" id="counter">0</div>
+    <button onclick="incrementCounter()">Click Me!</button>
+    <button onclick="resetCounter()">Reset</button>
+  </section>
+
+  <section id="about" class="card">
+    <h2>📖 About Quantum Playzone</h2>
+    <p>Quantum Playzone is a mini entertainment hub built for fun! Whether you're here to vibe to music or play simple games, you're in the right place.</p>
+  </section>
+
+  <section id="contact" class="card">
+    <h2>📬 Contact Us</h2>
+    <p>Have feedback or want to say hi?</p>
+    <p>Email: <a href="mailto:contact@quantumplayzone.com" style="color:#00f7ff;">contact@quantumplayzone.com</a></p>
+  </section>
+
+  <script>
+    let count = 0;
+
+    function incrementCounter() {
+      count++;
+      document.getElementById('counter').textContent = count;
+    }
+
+    function resetCounter() {
+      count = 0;
+      document.getElementById('counter').textContent = count;
+    }
+  </script>
+</body>
+</html>

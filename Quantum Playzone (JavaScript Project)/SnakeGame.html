@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🐍 Snake Game – Levels</title>
+  <style>
+
+    body {
+      background: black;
+      color: #00f0ff;
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+nav {
+  background-color: #000000a0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+nav a {
+  color: #00f7ff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+nav a:hover {
+  background-color: #00f7ff;
+  color: #000;
+}
+
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #00f0ff;
+    }
+
+    label, select, button {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #00f0ff;
+    }
+
+    label {
+      margin-right: 10px;
+      text-transform: uppercase;
+    }
+
+    select {
+      background: #1a1f29;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      color: #00f0ff;
+      box-shadow: 0 0 10px #00f0ff inset;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.3s ease;
+    }
+    select:hover, select:focus {
+      background: #005577;
+    }
+
+    button {
+      background: linear-gradient(45deg, #00f0ff, #007bff);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      margin-left: 15px;
+      cursor: pointer;
+      color: white;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px #00f0ff;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 16px;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #00f0ff, 0 0 40px #007bff;
+    }
+
+    #gameContainer {
+      margin: 20px auto 10px;
+      background: radial-gradient(circle at center, #001d3d, #000);
+      border-radius: 15px;
+      width: 420px;
+      height: 420px;
+      box-shadow: 0 0 50px #00f0ff inset;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      background: transparent;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #00f0ff inset;
+      display: block;
+      margin: auto;
+    }
+
+    #score {
+      font-size: 20px;
+      margin-top: 10px;
+      text-shadow: 0 0 10px #00f0ff;
+      height: 28px;
+    }
+  </style>
+</head>
+<body>
+
+ <nav>
+    <a href="index.html">Home</a>
+    <a href="music1.html">Music</a>
+    <a href="game.html">Game Menu</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <h1>🐍 SNAKE GAME – LEVELS</h1>
+
+  <div>
+    <label for="level">Choose Level:</label>
+    <select id="level">
+      <option value="beginner">Beginner</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+    <button id="startBtn">Start Game</button>
+  </div>
+
+  <div id="gameContainer">
+    <canvas id="game" width="400" height="400"></canvas>
+  </div>
+
+  <div id="score">Score: 0</div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const scoreEl = document.getElementById("score");
+    const startBtn = document.getElementById("startBtn");
+    const levelSel = document.getElementById("level");
+
+    const box = 20;
+    let snake = [], direction = "RIGHT", foods = [], score = 0;
+    let gameLoop, gameSpeed = 250, foodCount = 3;
+
+    const bgImg = new Image();
+    bgImg.src = "background.png";
+
+    const fruitImg = new Image();
+    fruitImg.src = "fruit.png";
+
+    const snakeHeadImg = new Image();
+    snakeHeadImg.src = "snakeHead.png";
+
+    const snakeBodyImg = new Image();
+    snakeBodyImg.src = "snakeBody.png";
+
+    function initGame() {
+      snake = [{ x: 5 * box, y: 5 * box }];
+      direction = "RIGHT"; 
+      score = 0;
+      foods = [];
+      scoreEl.textContent = "Score: " + score;
+
+      const level = levelSel.value;
+      if (level === "beginner") {
+        gameSpeed = 300;
+        foodCount = 6;
+      } else if (level === "medium") {
+        gameSpeed = 200;
+        foodCount = 3;
+      } else if (level === "hard") {
+        gameSpeed = 120;
+        foodCount = 8;
+      }
+
+      createFoods();
+      clearInterval(gameLoop);
+      gameLoop = setInterval(draw, gameSpeed);
+      startBtn.disabled = true;
+    }
+
+    function createFoods() {
+      foods = [];
+      for (let i = 0; i < foodCount; i++) {
+        let fx, fy, valid = false;
+        while (!valid) {
+          fx = Math.floor(Math.random() * (canvas.width / box)) * box;
+          fy = Math.floor(Math.random() * (canvas.height / box)) * box;
+          valid = !snake.some(s => s.x === fx && s.y === fy) &&
+                  !foods.some(f => f.x === fx && f.y === fy);
+        }
+        foods.push({ x: fx, y: fy });
+      }
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+      else if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+      else if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+      else if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+    });
+
+    function draw() {
+      if (bgImg.complete) {
+        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = "#001d3d";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      snake.forEach((seg, i) => {
+        if (i === 0 && snakeHeadImg.complete) {
+          drawRotatedImage(snakeHeadImg, seg.x, seg.y, direction);
+        } else if (snakeBodyImg.complete) {
+          ctx.drawImage(snakeBodyImg, seg.x, seg.y, box, box);
+        } else {
+          ctx.fillStyle = i === 0 ? "#00f0ff" : "#a78bfa";
+          ctx.fillRect(seg.x, seg.y, box, box);
+        }
+        ctx.strokeStyle = "#0f172a";
+        ctx.strokeRect(seg.x, seg.y, box, box);
+      });
+
+      foods.forEach(f => {
+        if (fruitImg.complete) {
+          ctx.drawImage(fruitImg, f.x, f.y, box, box);
+        } else {
+          ctx.fillStyle = "#34d399";
+          ctx.fillRect(f.x, f.y, box, box);
+        }
+      });
+
+      let snakeX = snake[0].x;
+      let snakeY = snake[0].y;
+
+      if (direction === "LEFT") snakeX -= box;
+      else if (direction === "UP") snakeY -= box;
+      else if (direction === "RIGHT") snakeX += box;
+      else if (direction === "DOWN") snakeY += box;
+
+      let ate = false;
+      for (let i = 0; i < foods.length; i++) {
+        if (snakeX === foods[i].x && snakeY === foods[i].y) {
+          ate = true;
+          score++;
+          scoreEl.textContent = "Score: " + score;
+
+          let fx, fy, valid = false;
+          while (!valid) {
+            fx = Math.floor(Math.random() * (canvas.width / box)) * box;
+            fy = Math.floor(Math.random() * (canvas.height / box)) * box;
+            valid = !snake.some(s => s.x === fx && s.y === fy) &&
+                    !foods.some(f => f.x === fx && f.y === fy);
+          }
+          foods[i] = { x: fx, y: fy };
+        }
+      }
+
+      if (!ate) snake.pop();
+
+      const newHead = { x: snakeX, y: snakeY };
+
+      if (
+        snakeX < 0 || snakeY < 0 ||
+        snakeX >= canvas.width || snakeY >= canvas.height ||
+        collision(newHead, snake)
+      ) {
+        clearInterval(gameLoop);
+        startBtn.disabled = false;
+        scoreEl.textContent = "Game Over! Score: " + score;
+        return;
+      }
+
+      snake.unshift(newHead);
+    }
+
+    function collision(head, array) {
+      return array.some(seg => head.x === seg.x && head.y === seg.y);
+    }
+
+    function drawRotatedImage(img, x, y, dir) {
+      const angleMap = {
+        "RIGHT": 0,
+        "DOWN": Math.PI / 2,
+        "LEFT": Math.PI,
+        "UP": -Math.PI / 2,
+      };
+
+      const angle = angleMap[dir] || 0;
+
+      ctx.save();
+      ctx.translate(x + box / 2, y + box / 2);
+      ctx.rotate(angle);
+      ctx.drawImage(img, -box / 2, -box / 2, box, box);
+      ctx.restore();
+    }
+
+    startBtn.addEventListener("click", initGame);
+  </script>
+</body>
+</html>
